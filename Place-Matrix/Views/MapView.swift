@@ -19,6 +19,8 @@ struct MapView: View {
     /// 既定は .automatic。登録済みの場所と現在地がすべて収まるように地図が自動で寄る。
     @State private var camera: MapCameraPosition = .automatic
     @State private var selectedPlaceId: Int64?
+    /// 詳細を開く対象。地図上の Place をタップすると入る。
+    @State private var detailPlace: Place?
     /// 地図をタップして選んだ、まだ登録していない地点
     @State private var pendingCoordinate: CLLocationCoordinate2D?
     /// 編集画面に渡す、まだ保存していない Place
@@ -41,6 +43,9 @@ struct MapView: View {
                         pendingCoordinate = coordinate
                     }
                 }
+            }
+            .navigationDestination(item: $detailPlace) { place in
+                PlaceDetailView(place: place)
             }
             .navigationTitle("地図")
             .navigationBarTitleDisplayMode(.inline)
@@ -154,9 +159,11 @@ struct MapView: View {
 
     // MARK: - 操作
 
+    /// 地図上の Place をタップしたら詳細を開く（仕様書 §18-9）
     private func select(_ place: Place) {
         pendingCoordinate = nil
-        selectedPlaceId = (selectedPlaceId == place.id) ? nil : place.id
+        selectedPlaceId = place.id
+        detailPlace = place
     }
 
     /// タップした地点を編集画面へ渡す。保存は編集画面側で行う。
