@@ -15,7 +15,7 @@ struct Place_MatrixApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootTabView()
                 .environment(store)
                 .task { store.start() }
         }

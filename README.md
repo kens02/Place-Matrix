@@ -95,7 +95,7 @@ MVP を開発中です。
 - [x] Phase 2 — SQLiteManager
 - [x] Phase 3 — Repositories + AppStore
 - [x] Phase 4 — 表示コンポーネント
-- [ ] Phase 5 — 地図 + 現在地
+- [x] Phase 5 — 地図 + 現在地
 - [ ] Phase 6 — 一覧・詳細
 - [ ] Phase 7 — 編集（CRUD）
 - [ ] Phase 8 — E2E 検証
