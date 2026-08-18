@@ -7,29 +7,64 @@
 
 import SwiftUI
 
-/// 場所の一覧画面。
-///
-/// Phase 6 で検索・削除・詳細への遷移を追加する。
+/// 場所の一覧画面。検索と削除、詳細への遷移ができる（仕様書 §13 / §18-12）。
 struct PlaceListView: View {
 
     @Environment(AppStore.self) private var store
 
     var body: some View {
+        @Bindable var store = store
+
         NavigationStack {
             Group {
                 if store.places.isEmpty {
-                    ContentUnavailableView(
-                        "場所がありません",
-                        systemImage: "mappin.slash",
-                        description: Text("地図をタップすると場所を登録できます")
-                    )
+                    emptyView
                 } else {
-                    List(store.places) { place in
-                        PlaceRow(place: place, informations: store.informations(for: place.id))
+                    List {
+                        ForEach(store.places) { place in
+                            NavigationLink(value: place) {
+                                PlaceRow(
+                                    place: place,
+                                    informations: store.informations(for: place.id),
+                                    templateName: store.templateName(for: place)
+                                )
+                            }
+                            // onDelete だと削除ボタンが英語のままになるため、自前で用意する
+                            .swipeActions(edge: .trailing) {
+                                Button("削除", systemImage: "trash", role: .destructive) {
+                                    store.delete(placeId: place.id)
+                                }
+                            }
+                        }
                     }
                 }
             }
             .navigationTitle("一覧")
+            .navigationDestination(for: Place.self) { place in
+                PlaceDetailView(place: place)
+            }
+            .searchable(text: $store.searchText, prompt: "名称・カテゴリで検索")
+            // 入力のたびに Repository 側で LIKE 検索し直す
+            .onChange(of: store.searchText) { _, _ in
+                store.reloadPlaces()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var emptyView: some View {
+        if store.searchText.isEmpty {
+            ContentUnavailableView(
+                "場所がありません",
+                systemImage: "mappin.slash",
+                description: Text("地図をタップすると場所を登録できます")
+            )
+        } else {
+            ContentUnavailableView(
+                "見つかりませんでした",
+                systemImage: "magnifyingglass",
+                description: Text("「\(store.searchText)」に一致する場所はありません")
+            )
         }
     }
 }
