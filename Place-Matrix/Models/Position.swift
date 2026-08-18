@@ -34,6 +34,11 @@ enum Position: String, CaseIterable, Identifiable, Codable, Sendable {
         }
     }
 
+    /// 表示順・並べ替えに使う序列（左上→右上→左下→右下）
+    var sortIndex: Int {
+        Self.allCases.firstIndex(of: self) ?? 0
+    }
+
     /// DB に保存された文字列から復元する。未知の値は `.single` とみなす。
     static func from(rawValue: String) -> Position {
         Position(rawValue: rawValue) ?? .single
