@@ -92,7 +92,7 @@ MVP を開発中です。
 
 - [x] Phase 0 — Git / GitHub 基盤
 - [x] Phase 1 — Models + レベル定義
-- [ ] Phase 2 — SQLiteManager
+- [x] Phase 2 — SQLiteManager
 - [ ] Phase 3 — Repositories + AppStore
 - [ ] Phase 4 — 表示コンポーネント
 - [ ] Phase 5 — 地図 + 現在地
