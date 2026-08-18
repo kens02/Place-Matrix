@@ -14,13 +14,15 @@ import MapKit
 struct MapView: View {
 
     @Environment(AppStore.self) private var store
-    @State private var location = LocationService()
+    private let location = LocationService.shared
 
     /// 既定は .automatic。登録済みの場所と現在地がすべて収まるように地図が自動で寄る。
     @State private var camera: MapCameraPosition = .automatic
     @State private var selectedPlaceId: Int64?
     /// 地図をタップして選んだ、まだ登録していない地点
     @State private var pendingCoordinate: CLLocationCoordinate2D?
+    /// 編集画面に渡す、まだ保存していない Place
+    @State private var editingPlace: Place?
     var body: some View {
         NavigationStack {
             MapReader { proxy in
@@ -55,6 +57,11 @@ struct MapView: View {
                     addPlaceCard
                 } else if location.isDenied {
                     locationDeniedNotice
+                }
+            }
+            .sheet(item: $editingPlace) { place in
+                PlaceEditView(place: place) { saved in
+                    selectedPlaceId = saved.id
                 }
             }
             .onAppear {
@@ -121,7 +128,7 @@ struct MapView: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button("登録する") {
+                Button("次へ") {
                     addPendingPlace()
                 }
                 .buttonStyle(.borderedProminent)
@@ -152,18 +159,10 @@ struct MapView: View {
         selectedPlaceId = (selectedPlaceId == place.id) ? nil : place.id
     }
 
-    /// タップした地点を登録する。
-    /// 名称や Template の設定は Phase 7 の編集画面から行う。
+    /// タップした地点を編集画面へ渡す。保存は編集画面側で行う。
     private func addPendingPlace() {
         guard let coordinate = pendingCoordinate else { return }
-
-        let place = Place(
-            name: "新しい場所",
-            coordinate: coordinate
-        )
-        if let saved = store.save(place) {
-            selectedPlaceId = saved.id
-        }
+        editingPlace = Place(coordinate: coordinate)
         pendingCoordinate = nil
     }
 

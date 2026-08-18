@@ -20,6 +20,20 @@ struct PlaceDetailView: View {
     let place: Place
 
     @State private var isDeleteConfirmationPresented = false
+    @State private var editTarget: EditTarget?
+
+    /// 開く編集画面。sheet を複数付けると互いに打ち消し合うため1つにまとめる。
+    private enum EditTarget: Identifiable {
+        case place(Place)
+        case information(Information)
+
+        var id: String {
+            switch self {
+            case .place(let place): "place-\(place.id)"
+            case .information(let information): "information-\(information.id)-\(information.position.rawValue)"
+            }
+        }
+    }
 
     /// 編集で内容が変わっても追随できるよう、毎回 store から引き直す
     private var current: Place {
@@ -40,6 +54,22 @@ struct PlaceDetailView: View {
         }
         .navigationTitle(current.name.isEmpty ? "名称未設定" : current.name)
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("編集") { editTarget = .place(current) }
+            }
+        }
+        .sheet(item: $editTarget) { target in
+            switch target {
+            case .place(let place):
+                PlaceEditView(place: place)
+            case .information(let information):
+                InformationEditView(
+                    information: information,
+                    allowsPositionChange: current.displayMode == .fourQuadrant
+                )
+            }
+        }
         .confirmationDialog(
             "この場所を削除しますか？",
             isPresented: $isDeleteConfirmationPresented,
@@ -93,10 +123,29 @@ struct PlaceDetailView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(informations) { information in
-                    InformationRow(information: information)
+                    Button {
+                        editTarget = .information(information)
+                    } label: {
+                        InformationRow(information: information)
+                            // 行全体をタップできるようにする（余白部分もヒットさせる）
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            if let position = nextAvailablePosition {
+                Button("情報を追加", systemImage: "plus.circle.fill") {
+                    editTarget = .information(Information(placeId: current.id, position: position))
                 }
             }
         }
+    }
+
+    /// まだ埋まっていない表示位置。すべて埋まっていれば nil。
+    private var nextAvailablePosition: Position? {
+        let used = Set(informations.map(\.position))
+        return current.displayMode.positions.first { !used.contains($0) }
     }
 
     private var detailSection: some View {

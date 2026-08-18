@@ -13,6 +13,9 @@ import Observation
 @Observable
 final class LocationService: NSObject, CLLocationManagerDelegate {
 
+    /// アプリ全体で共有する。位置マネージャを画面ごとに持たないため。
+    static let shared = LocationService()
+
     private let manager = CLLocationManager()
 
     private(set) var authorizationStatus: CLAuthorizationStatus

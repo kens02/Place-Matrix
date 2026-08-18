@@ -97,7 +97,7 @@ MVP を開発中です。
 - [x] Phase 4 — 表示コンポーネント
 - [x] Phase 5 — 地図 + 現在地
 - [x] Phase 6 — 一覧・詳細
-- [ ] Phase 7 — 編集（CRUD）
+- [x] Phase 7 — 編集（CRUD）
 - [ ] Phase 8 — E2E 検証
 
 ### MVP 完成後の検討事項
