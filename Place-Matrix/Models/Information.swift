@@ -64,6 +64,11 @@ struct Information: Identifiable, Hashable {
         LevelPalette.color(for: level)
     }
 
+    /// レベル色の上に載せる文字・アイコンの色
+    var levelForeground: Color {
+        LevelPalette.foreground(for: level)
+    }
+
     /// 実際に表示可能な SF Symbols 名（存在しなければ代替アイコン）
     var resolvedIconName: String {
         IconCatalog.resolvedIconName(iconName)

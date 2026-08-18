@@ -14,6 +14,9 @@ struct LevelDefinition: Identifiable, Hashable, Sendable {
     let level: Int
     let name: String
     let color: Color
+    /// `color` を背景に敷いたときに読める文字・アイコンの色。
+    /// 黄色のような明るい色に白を載せると読めなくなるため個別に持たせる。
+    let foreground: Color
 
     var id: Int { level }
 }
@@ -27,15 +30,15 @@ enum LevelPalette {
 
     /// MVP のデフォルト定義
     static let definitions: [LevelDefinition] = [
-        LevelDefinition(level: 0, name: "不明", color: .gray),
-        LevelDefinition(level: 1, name: "正常", color: .green),
-        LevelDefinition(level: 2, name: "注意", color: .yellow),
-        LevelDefinition(level: 3, name: "警戒", color: .orange),
-        LevelDefinition(level: 4, name: "危険", color: .red),
+        LevelDefinition(level: 0, name: "不明", color: .gray, foreground: .white),
+        LevelDefinition(level: 1, name: "正常", color: .green, foreground: .white),
+        LevelDefinition(level: 2, name: "注意", color: .yellow, foreground: .black),
+        LevelDefinition(level: 3, name: "警戒", color: .orange, foreground: .white),
+        LevelDefinition(level: 4, name: "危険", color: .red, foreground: .white),
     ]
 
     /// 未設定・範囲外のレベルに使う定義
-    static let unknown = LevelDefinition(level: 0, name: "不明", color: .gray)
+    static let unknown = LevelDefinition(level: 0, name: "不明", color: .gray, foreground: .white)
 
     /// 選択可能なレベルの範囲
     static var levels: [Int] { definitions.map(\.level) }
@@ -46,6 +49,11 @@ enum LevelPalette {
 
     static func color(for level: Int) -> Color {
         definition(for: level).color
+    }
+
+    /// レベル色の上に載せる文字・アイコンの色
+    static func foreground(for level: Int) -> Color {
+        definition(for: level).foreground
     }
 
     /// そのレベルの既定の名称（ユーザーが levelName を入力していない場合に使う）
